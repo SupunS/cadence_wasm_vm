@@ -1,5 +1,10 @@
 (module
+
+    (import "" "new_struct" (func $new_struct (result externref)))
+
     (memory 1)
+
+
     (func $recursive_fib (param $n i32) (result i32)
         (if (i32.lt_s (local.get $n) (i32.const 2))
             (return (local.get $n))
@@ -34,4 +39,25 @@
         (local.get $d)
     )
     (export "imperative_fib" (func $imperative_fib))
+
+    (func $create_struct_simple (result externref)
+        (call $new_struct)
+    )
+    (export "create_struct_simple" (func $create_struct_simple))
+
+    (func $create_struct
+        (local $a i32)
+        (local.set $a (i32.const 0))
+        (block (loop
+            (br_if 1 (i32.ge_s (local.get $a) (i32.const 7)))
+            (call $new_struct)
+            drop
+            (local.set $a (i32.add (local.get $a) (i32.const 1)))
+            (br 0)
+        ))
+    )
+    (export "create_struct" (func $create_struct))
+
+    (func $empty_function)
+    (export "empty_function" (func $empty_function))
 )

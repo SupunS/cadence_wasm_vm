@@ -93,3 +93,70 @@ func BenchmarkModuleLoading_wasmtime(b *testing.B) {
 		_, _ = wasmtime.NewInstance(store, module, []wasmtime.AsExtern{})
 	}
 }
+
+func TestExternFunction_wasmtime(t *testing.T) {
+
+	wasmBytes, err := os.ReadFile("fib.wasm")
+	require.NoError(t, err)
+
+	store := wasmtime.NewStore(wasmtime.NewEngine())
+	module, err := wasmtime.NewModule(store.Engine, wasmBytes)
+	require.NoError(t, err)
+
+	instance, err := wasmtime.NewInstance(store, module, ExternFunctions(store))
+
+	fib := instance.GetFunc(store, "create_struct_simple")
+
+	result, err := fib.Call(store)
+	require.NoError(t, err)
+
+	assert.Equal(t, Struct{name: "Foo"}, result)
+}
+
+func BenchmarkExternFunction_wasmtime(b *testing.B) {
+
+	wasmBytes, _ := os.ReadFile("fib.wasm")
+	store := wasmtime.NewStore(wasmtime.NewEngine())
+	module, _ := wasmtime.NewModule(store.Engine, wasmBytes)
+	instance, _ := wasmtime.NewInstance(store, module, ExternFunctions(store))
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	fib := instance.GetFunc(store, "create_struct")
+	for i := 0; i < b.N; i++ {
+		_, _ = fib.Call(store)
+	}
+}
+
+func BenchmarkEmptyFunction_wasmtime(b *testing.B) {
+
+	wasmBytes, _ := os.ReadFile("fib.wasm")
+	store := wasmtime.NewStore(wasmtime.NewEngine())
+	module, _ := wasmtime.NewModule(store.Engine, wasmBytes)
+	instance, _ := wasmtime.NewInstance(store, module, ExternFunctions(store))
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	fib := instance.GetFunc(store, "empty_function")
+	for i := 0; i < b.N; i++ {
+		_, _ = fib.Call(store)
+	}
+}
+
+func BenchmarkGoFunction(b *testing.B) {
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		create_struct()
+	}
+}
+
+func create_struct() {
+	for i := 0; i < 7; i++ {
+		NewStruct()
+	}
+}
