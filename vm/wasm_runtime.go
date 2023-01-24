@@ -26,7 +26,6 @@ import (
 
 type WASMRuntime struct {
 	store  *wasmtime.Store
-	memory *wasmtime.Memory
 	Config *interpreter.Config
 }
 
@@ -37,8 +36,4 @@ func NewWASMRuntime(store *wasmtime.Store) *WASMRuntime {
 			Storage: interpreter.NewInMemoryStorage(nil),
 		},
 	}
-}
-
-func (r *WASMRuntime) SetMemory(memory *wasmtime.Memory) {
-	r.memory = memory
 }

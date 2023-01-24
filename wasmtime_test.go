@@ -235,9 +235,6 @@ func TestNewStructValue(t *testing.T) {
 	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
 	require.NoError(t, err)
 
-	memory := instance.GetExport(store, "memory").Memory()
-	runtime.SetMemory(memory)
-
 	function := instance.GetFunc(store, "create_composite_value")
 
 	result, err := function.Call(store)
@@ -263,9 +260,6 @@ func BenchmarkNewStructValue(b *testing.B) {
 	runtime := vm.NewWASMRuntime(store)
 	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
 	require.NoError(b, err)
-
-	memory := instance.GetExport(store, "memory").Memory()
-	runtime.SetMemory(memory)
 
 	b.ReportAllocs()
 	b.ResetTimer()

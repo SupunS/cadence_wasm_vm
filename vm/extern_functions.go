@@ -28,17 +28,17 @@ var ExternFunctions = func(runtime *WASMRuntime) []wasmtime.AsExtern {
 	return []wasmtime.AsExtern{
 		wasmtime.WrapFunc(runtime.store, NewStruct),
 		wasmtime.WrapFunc(runtime.store, NewCompositeValueExternFunc(runtime)),
-		wasmtime.WrapFunc(runtime.store, StringLoadExternFunc(runtime)),
+		wasmtime.WrapFunc(runtime.store, StringLoadExternFunc),
 		wasmtime.WrapFunc(runtime.store, NewAddressLocationFromHex),
 	}
 }
 
-func StringLoadExternFunc(runtime *WASMRuntime) func(index, len int32) string {
-	return func(index, len int32) string {
-		// TODO: any better way to access 'data' section?
-		data := runtime.memory.UnsafeData(runtime.store)
-		return string(data[index : index+len])
-	}
+func StringLoadExternFunc(caller *wasmtime.Caller, index, len int32) string {
+	// Should always read from caller's memory/data
+	// TODO: any better way to access 'data' section?
+	memory := caller.GetExport("memory").Memory()
+	data := memory.UnsafeData(caller)
+	return string(data[index : index+len])
 }
 
 func NewCompositeValueExternFunc(runtime *WASMRuntime) func(
@@ -47,6 +47,7 @@ func NewCompositeValueExternFunc(runtime *WASMRuntime) func(
 	kind int32,
 ) *CompositeValue {
 	return func(location common.Location, qualifiedIdentifier string, kind int32) *CompositeValue {
+
 		// TODO: validate
 		compositeKind := common.CompositeKind(kind)
 
