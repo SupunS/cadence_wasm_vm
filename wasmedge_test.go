@@ -33,7 +33,7 @@ package main
 //	)
 //
 //	/// Instantiate wasm
-//	err := vm.LoadWasmFile("fib.wasm")
+//	err := vm.LoadWasmFile("module1.wasm")
 //	require.NoError(t, err)
 //
 //	err = vm.Validate()

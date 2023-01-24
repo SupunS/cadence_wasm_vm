@@ -32,7 +32,7 @@ import (
 
 func TestRecursiveFib_wasmtime(t *testing.T) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(t, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -42,7 +42,7 @@ func TestRecursiveFib_wasmtime(t *testing.T) {
 
 	runtime := vm.NewWASMRuntime(store)
 
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(t, err)
 
 	fib := instance.GetFunc(store, "recursive_fib")
@@ -55,7 +55,7 @@ func TestRecursiveFib_wasmtime(t *testing.T) {
 
 func TestImperativeFib_wasmtime(t *testing.T) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(t, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -64,7 +64,7 @@ func TestImperativeFib_wasmtime(t *testing.T) {
 	require.NoError(t, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(t, err)
 
 	fib := instance.GetFunc(store, "imperative_fib")
@@ -77,7 +77,7 @@ func TestImperativeFib_wasmtime(t *testing.T) {
 
 func BenchmarkRecursiveFib_wasmtime(b *testing.B) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(b, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -86,7 +86,7 @@ func BenchmarkRecursiveFib_wasmtime(b *testing.B) {
 	require.NoError(b, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(b, err)
 
 	b.ReportAllocs()
@@ -100,7 +100,7 @@ func BenchmarkRecursiveFib_wasmtime(b *testing.B) {
 
 func BenchmarkImperativeFib_wasmtime(b *testing.B) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(b, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -109,7 +109,7 @@ func BenchmarkImperativeFib_wasmtime(b *testing.B) {
 	require.NoError(b, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(b, err)
 
 	b.ReportAllocs()
@@ -123,7 +123,7 @@ func BenchmarkImperativeFib_wasmtime(b *testing.B) {
 
 func BenchmarkModuleLoading_wasmtime(b *testing.B) {
 
-	wasmBytes, _ := os.ReadFile("fib.wasm")
+	wasmBytes, _ := os.ReadFile("module.wasm")
 	store := wasmtime.NewStore(wasmtime.NewEngine())
 
 	b.ReportAllocs()
@@ -133,13 +133,13 @@ func BenchmarkModuleLoading_wasmtime(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		module, _ := wasmtime.NewModule(store.Engine, wasmBytes)
-		_, _ = wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+		_, _ = wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	}
 }
 
 func TestExternFunction_wasmtime(t *testing.T) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(t, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -148,7 +148,7 @@ func TestExternFunction_wasmtime(t *testing.T) {
 	require.NoError(t, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(t, err)
 
 	function := instance.GetFunc(store, "create_struct_simple")
@@ -161,7 +161,7 @@ func TestExternFunction_wasmtime(t *testing.T) {
 
 func BenchmarkExternFunction_wasmtime(b *testing.B) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(b, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -170,7 +170,7 @@ func BenchmarkExternFunction_wasmtime(b *testing.B) {
 	require.NoError(b, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(b, err)
 
 	b.ReportAllocs()
@@ -184,7 +184,7 @@ func BenchmarkExternFunction_wasmtime(b *testing.B) {
 
 func BenchmarkEmptyFunction_wasmtime(b *testing.B) {
 
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module.wasm")
 	require.NoError(b, err)
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
@@ -193,7 +193,7 @@ func BenchmarkEmptyFunction_wasmtime(b *testing.B) {
 	require.NoError(b, err)
 
 	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctionsWrappers(runtime))
 	require.NoError(b, err)
 
 	b.ReportAllocs()
@@ -221,22 +221,49 @@ func create_struct() {
 	}
 }
 
-func TestNewStructValue(t *testing.T) {
-
-	wasmBytes, err := os.ReadFile("fib.wasm")
-	require.NoError(t, err)
+func TestNewCompositeValue(t *testing.T) {
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
-	module, err := wasmtime.NewModule(store.Engine, wasmBytes)
-	require.NoError(t, err)
-
 	runtime := vm.NewWASMRuntime(store)
+	externFuncs := vm.ExternFunctions(runtime)
 
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	mainContract, err := wasmtime.NewModuleFromFile(store.Engine, "module1.wasm")
 	require.NoError(t, err)
 
-	function := instance.GetFunc(store, "create_composite_value")
+	importedContract, err := wasmtime.NewModuleFromFile(store.Engine, "module2.wasm")
+	require.NoError(t, err)
 
+	fields := map[string]interface{}{}
+	externFuncs["set_int_member"] = func(self *vm.CompositeValue, fieldName string, value int32) {
+		fields[fieldName] = value
+	}
+	externFuncs["set_member"] = func(self *vm.CompositeValue, fieldName string, value interface{}) {
+		fields[fieldName] = value
+	}
+
+	linker := wasmtime.NewLinker(store.Engine)
+	for name, function := range externFuncs {
+		err = linker.DefineFunc(store, "", name, function)
+		require.NoError(t, err)
+	}
+
+	// The imported module is instantiated first since it has no imports
+	importedContractInstance, err := linker.Instantiate(store, importedContract)
+	require.NoError(t, err)
+
+	err = linker.DefineInstance(store, "0x2.ImportedContract", importedContractInstance)
+	require.NoError(t, err)
+
+	// Then instantiate the main module
+	mainContractInstance, err := linker.Instantiate(store, mainContract)
+	require.NoError(t, err)
+
+	err = linker.DefineInstance(store, "0x1.MainContract", mainContractInstance)
+	require.NoError(t, err)
+
+	// Call the function
+
+	function := mainContractInstance.GetFunc(store, "create_composite_value")
 	result, err := function.Call(store)
 	require.NoError(t, err)
 
@@ -245,27 +272,57 @@ func TestNewStructValue(t *testing.T) {
 
 	assert.Equal(t, "Foo", compositeValue.QualifiedIdentifier)
 	assert.Equal(t, common.CompositeKindStructure, compositeValue.Kind)
+
+	require.Len(t, fields, 2)
+	assert.Equal(t, int32(4), fields["a"])
+	assert.Equal(t, "Hello", fields["b"])
 }
 
-func BenchmarkNewStructValue(b *testing.B) {
-
-	wasmBytes, err := os.ReadFile("fib.wasm")
-	require.NoError(b, err)
+func BenchmarkNewCompositeValue(b *testing.B) {
 
 	store := wasmtime.NewStore(wasmtime.NewEngine())
+	runtime := vm.NewWASMRuntime(store)
+	externFuncs := vm.ExternFunctions(runtime)
 
-	module, err := wasmtime.NewModule(store.Engine, wasmBytes)
+	mainContract, err := wasmtime.NewModuleFromFile(store.Engine, "module1.wasm")
 	require.NoError(b, err)
 
-	runtime := vm.NewWASMRuntime(store)
-	instance, err := wasmtime.NewInstance(store, module, vm.ExternFunctions(runtime))
+	importedContract, err := wasmtime.NewModuleFromFile(store.Engine, "module2.wasm")
+	require.NoError(b, err)
+
+	//fields := map[string]interface{}{}
+	externFuncs["set_int_member"] = func(self *vm.CompositeValue, fieldName string, value int32) {
+		//fields[fieldName] = value
+	}
+	externFuncs["set_member"] = func(self *vm.CompositeValue, fieldName string, value interface{}) {
+		//fields[fieldName] = value
+	}
+
+	linker := wasmtime.NewLinker(store.Engine)
+	for name, function := range externFuncs {
+		err = linker.DefineFunc(store, "", name, function)
+		require.NoError(b, err)
+	}
+
+	// The imported module is instantiated first since it has no imports
+	importedContractInstance, err := linker.Instantiate(store, importedContract)
+	require.NoError(b, err)
+
+	err = linker.DefineInstance(store, "0x2.ImportedContract", importedContractInstance)
+	require.NoError(b, err)
+
+	// Then instantiate the main module
+	mainContractInstance, err := linker.Instantiate(store, mainContract)
+	require.NoError(b, err)
+
+	err = linker.DefineInstance(store, "0x1.MainContract", mainContractInstance)
 	require.NoError(b, err)
 
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	function := instance.GetFunc(store, "benchmark_composite_value")
+	function := mainContractInstance.GetFunc(store, "benchmark_composite_value")
 	for i := 0; i < b.N; i++ {
-		_, _ = function.Call(store)
+		_, _ = function.Call(store, 10)
 	}
 }

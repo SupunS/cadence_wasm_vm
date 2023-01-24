@@ -24,12 +24,19 @@ import (
 	"github.com/onflow/cadence/runtime/common"
 )
 
-var ExternFunctions = func(runtime *WASMRuntime) []wasmtime.AsExtern {
+var ExternFunctionsWrappers = func(runtime *WASMRuntime) []wasmtime.AsExtern {
 	return []wasmtime.AsExtern{
 		wasmtime.WrapFunc(runtime.store, NewStruct),
-		wasmtime.WrapFunc(runtime.store, NewCompositeValueExternFunc(runtime)),
 		wasmtime.WrapFunc(runtime.store, StringLoadExternFunc),
-		wasmtime.WrapFunc(runtime.store, NewAddressLocationFromHex),
+	}
+}
+
+var ExternFunctions = func(runtime *WASMRuntime) map[string]interface{} {
+	return map[string]interface{}{
+		"new_struct":           NewStruct,
+		"new_composite_value":  NewCompositeValueExternFunc(runtime),
+		"string_const":         StringLoadExternFunc,
+		"new_address_location": NewAddressLocationFromHex,
 	}
 }
 

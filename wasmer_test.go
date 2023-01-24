@@ -30,7 +30,7 @@ import (
 )
 
 func TestRecursiveFib_wasmer(t *testing.T) {
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module1.wasm")
 	require.NoError(t, err)
 
 	engine := wasmer.NewEngine()
@@ -58,7 +58,7 @@ func TestRecursiveFib_wasmer(t *testing.T) {
 }
 
 func TestImperativeFib_wasmer(t *testing.T) {
-	wasmBytes, err := os.ReadFile("fib.wasm")
+	wasmBytes, err := os.ReadFile("module1.wasm")
 	require.NoError(t, err)
 
 	engine := wasmer.NewEngine()
@@ -82,7 +82,7 @@ func TestImperativeFib_wasmer(t *testing.T) {
 
 func BenchmarkRecursiveFib_wasmer(b *testing.B) {
 
-	wasmBytes, _ := os.ReadFile("fib.wasm")
+	wasmBytes, _ := os.ReadFile("module1.wasm")
 	engine := wasmer.NewEngine()
 	store := wasmer.NewStore(engine)
 
@@ -101,7 +101,7 @@ func BenchmarkRecursiveFib_wasmer(b *testing.B) {
 
 func BenchmarkImperativeFib_wasmer(b *testing.B) {
 
-	wasmBytes, _ := os.ReadFile("fib.wasm")
+	wasmBytes, _ := os.ReadFile("module1.wasm")
 	engine := wasmer.NewEngine()
 	store := wasmer.NewStore(engine)
 
@@ -120,7 +120,7 @@ func BenchmarkImperativeFib_wasmer(b *testing.B) {
 
 func BenchmarkModuleLoading_wasmer(b *testing.B) {
 
-	wasmBytes, _ := os.ReadFile("fib.wasm")
+	wasmBytes, _ := os.ReadFile("module1.wasm")
 	engine := wasmer.NewEngine()
 	store := wasmer.NewStore(engine)
 
@@ -136,7 +136,7 @@ func BenchmarkModuleLoading_wasmer(b *testing.B) {
 
 func TestExternFunction_wasmer(t *testing.T) {
 
-	wasmBytes, _ := os.ReadFile("fib.wasm")
+	wasmBytes, _ := os.ReadFile("module1.wasm")
 	engine := wasmer.NewEngine()
 	store := wasmer.NewStore(engine)
 
