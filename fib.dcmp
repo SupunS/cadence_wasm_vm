@@ -31,7 +31,7 @@ export function create_struct_simple():externref {
 export function create_struct() {
   var a:int = 0;
   loop L_b {
-    if (a >= 7) goto B_a;
+    if (a >= 100) goto B_a;
     new_struct();
     a = a + 1;
     continue L_b;

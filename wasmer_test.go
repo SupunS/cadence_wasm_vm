@@ -1,6 +1,25 @@
+/*
+ * Cadence - The resource-oriented smart contract programming language
+ *
+ * Copyright Dapper Labs, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package main
 
 import (
+	"cadence_wasm_vm/vm"
 	"os"
 	"testing"
 
@@ -113,4 +132,36 @@ func BenchmarkModuleLoading_wasmer(b *testing.B) {
 		importObject := wasmer.NewImportObject()
 		_, _ = wasmer.NewInstance(module, importObject)
 	}
+}
+
+func TestExternFunction_wasmer(t *testing.T) {
+
+	wasmBytes, _ := os.ReadFile("fib.wasm")
+	engine := wasmer.NewEngine()
+	store := wasmer.NewStore(engine)
+
+	module, _ := wasmer.NewModule(store, wasmBytes)
+	importObject := wasmer.NewImportObject()
+	importObject.Register("", map[string]wasmer.IntoExtern{
+		"new_struct": wasmer.NewFunction(
+			store,
+			wasmer.NewFunctionType(
+				[]*wasmer.ValueType{},
+				wasmer.NewValueTypes(wasmer.AnyRef),
+			),
+			func(values []wasmer.Value) ([]wasmer.Value, error) {
+				return []wasmer.Value{
+					// Unfortunately wasmer doesn't support non-primitive values yet.
+					// https://github.com/wasmerio/wasmer-go/issues/330
+					wasmer.NewValue(vm.NewStruct(), wasmer.AnyRef),
+				}, nil
+			}),
+	})
+
+	instance, _ := wasmer.NewInstance(module, importObject)
+
+	function, _ := instance.Exports.GetFunction("create_struct_simple")
+	result, err := function()
+	require.NoError(t, err)
+	assert.Equal(t, vm.Struct{Name: "Foo"}, result)
 }
